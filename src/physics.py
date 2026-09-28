@@ -84,8 +84,32 @@ def eccentricity_from_state(
 
 
 def kepler_period(semi_major_axis: float, central_mass: float) -> float:
-    """Orbital period T = 2 pi sqrt(a^3 / (G M))."""
+    """Orbital period P = 2 pi sqrt(a^3 / (G M))."""
     return 2 * np.pi * np.sqrt(semi_major_axis**3 / (G * central_mass))
+
+
+# Sidereal period of Earth used in the synodic-period relation, in days.
+P_EARTH_DAYS = 365.26
+
+
+def synodic_period_days(
+    sidereal_period_days: float,
+    *,
+    superior: bool,
+    earth_period_days: float = P_EARTH_DAYS,
+) -> float:
+    """
+    Synodic period S from the planet's sidereal period P.
+
+    Superior planets (outside Earth's orbit): 1/S = 1/P_earth - 1/P
+    Inferior planets (inside Earth's orbit):  1/S = 1/P - 1/P_earth
+    """
+    p = sidereal_period_days
+    pe = earth_period_days
+    inverse = (1.0 / pe - 1.0 / p) if superior else (1.0 / p - 1.0 / pe)
+    if inverse <= 0:
+        raise ValueError("Sidereal period is on the wrong side of Earth's period.")
+    return 1.0 / inverse
 
 
 def nbody_accelerations(

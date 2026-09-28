@@ -1,11 +1,14 @@
 {
   "slug": "retrograde-motion",
   "title": "Retrograde Motion",
-  "subtitle": "Apparent sky motion from Earth",
-  "description": "Heliocentric simulation and geocentric longitude — why Mars appears to move backward.",
+  "subtitle": "Mars appears to move backward",
+  "description": "Sidereal and synodic periods, and an animation of the Earth–Mars lines of sight that cross while Mars is in retrograde.",
   "topics": ["Observational Astronomy", "Orbital Mechanics"],
-  "tools": ["Python"],
-  "status": "coming-soon",
-  "featured": false,
-  "notebook": null
+  "tools": ["Python", "Jupyter", "NumPy"],
+  "status": "published",
+  "featured": true,
+  "notebook": "notebooks/retrograde_motion.ipynb",
+  "sourceRepoPath": "notebooks/retrograde_motion.ipynb",
+  "learning": "Carroll & Ostlie — retrograde motion, sidereal and synodic periods",
+  "published": "2026-09-28"
 }

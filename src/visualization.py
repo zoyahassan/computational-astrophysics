@@ -94,25 +94,29 @@ def plot_orbit_diagnostics(history: OrbitHistory) -> plt.Figure:
     return fig
 
 
-def plot_kepler_third_law(
-    samples: list[KeplerLawSample],
-    slope: float,
-    intercept: float,
-    theoretical_slope: float,
-) -> plt.Figure:
-    a3 = np.array([s.semi_major_axis**3 for s in samples])
-    t2 = np.array([s.period**2 for s in samples])
-    a3_fit = np.linspace(a3.min(), a3.max(), 50)
-    t2_fit = slope * a3_fit + intercept
-    t2_theory = theoretical_slope * a3_fit
+def plot_kepler_third_law(samples: list[KeplerLawSample]) -> plt.Figure:
+    """
+    P² versus a³ for orbits around the Sun.
+
+    In years and AU, Kepler's third law is the straight line P² = a³.
+    """
+    from src.physics import AU, YEAR
+
+    apply_dark_style()
+    a_au = np.array([s.semi_major_axis / AU for s in samples])
+    p_yr = np.array([s.period / YEAR for s in samples])
+    a3 = a_au**3
+    p2 = p_yr**2
 
     fig, ax = plt.subplots(figsize=(7, 5))
-    ax.scatter(a3, t2, label="simulations", zorder=3)
-    ax.plot(a3_fit, t2_fit, label=f"fit: slope={slope:.3e}")
-    ax.plot(a3_fit, t2_theory, "--", label=f"theory: 4π²/(GM)={theoretical_slope:.3e}")
-    ax.set_xlabel("a³ (m³)")
-    ax.set_ylabel("T² (s²)")
-    ax.set_title("Kepler's third law: T² vs a³")
+    ax.scatter(a3, p2, s=40, zorder=3, label="simulated orbits")
+    x_line = np.linspace(float(a3.min()) * 0.9, float(a3.max()) * 1.05, 40)
+    slope, intercept = np.polyfit(a3, p2, 1)
+    ax.plot(x_line, slope * x_line + intercept, label=f"fit, slope = {slope:.3f}")
+    ax.plot(x_line, x_line, "--", label="theory: P² = a³")
+    ax.set_xlabel("a³  (AU³)")
+    ax.set_ylabel("P²  (years²)")
+    ax.set_title("Kepler's third law")
     ax.legend()
     fig.tight_layout()
     return fig

@@ -1,0 +1,86 @@
+<h1>Retrograde Motion</h1>
+<p>From Earth, Mars usually creeps eastward from one night to the next. Around the time Earth passes it, that drift reverses: Mars moves westward for a few weeks, then turns east again. The westward part is <strong>retrograde motion</strong>. Mars keeps orbiting the Sun in the same direction the whole time. What changes is the direction of our line of sight.</p>
+<div id="sky-stage"></div>
+
+<h2>Sidereal period</h2>
+<p><strong>Sidereal period (P):</strong> how long it takes an object to complete one orbit relative to the stars.</p>
+<p>Earth's sidereal period is</p>
+<p>$$P_\oplus = 365.26\ \text{days}.$$</p>
+<p>Mars's sidereal period is longer, about 687 days, because Mars orbits farther from the Sun.</p>
+<h2>Synodic period</h2>
+<p><strong>Synodic period (S):</strong> how long it takes an object to return to the same apparent position relative to the Earth and the Sun.</p>
+<p>That is the time from one alignment of Sun–Earth–planet to the next. For Mars, this is the time between oppositions, when Mars is opposite the Sun in our sky.</p>
+<h2>How P and S are related</h2>
+<p>$$
+\frac{1}{S} =
+\begin{cases}
+\dfrac{1}{P} - \dfrac{1}{P_\oplus} & \text{(inferior)} \\[6pt]
+\dfrac{1}{P_\oplus} - \dfrac{1}{P} & \text{(superior)}
+\end{cases}
+$$</p>
+<ul>
+<li>An <strong>inferior</strong> planet orbits inside Earth's orbit (Mercury, Venus), so it has the shorter sidereal period.</li>
+<li>A <strong>superior</strong> planet orbits outside Earth's orbit (Mars and the planets beyond), so Earth has the shorter sidereal period.</li>
+</ul>
+<p>The two versions are the same idea: the synodic period comes from how fast one orbit gains on the other.</p>
+<h2>Orbital speed</h2>
+<p>$$
+v = \frac{d}{t}.
+$$</p>
+<p>Here <strong>d</strong> is the distance traveled in one orbit (the circumference) and <strong>t</strong> is the time for that orbit, which is the sidereal period <strong>P</strong>. So</p>
+<p>$$
+v = \frac{2\pi a}{P}.
+$$</p>
+<p>Earth, being closer to the Sun, has a shorter period and a higher orbital speed than Mars. Earth catches up to Mars, passes it, and pulls ahead. That overtaking is when Mars appears to move backward.</p>
+
+<details class="code-fold">
+  <summary>Show Python</summary>
+  <pre><code class="language-python">import sys
+from pathlib import Path
+
+ROOT = Path.cwd().parent if Path.cwd().name == &quot;notebooks&quot; else Path.cwd()
+if str(ROOT) not in sys.path:
+    sys.path.insert(0, str(ROOT))
+
+import numpy as np
+
+from src.physics import AU, P_EARTH_DAYS, synodic_period_days
+
+P_MARS = 686.98  # days
+P_VENUS = 224.70  # days
+A_MARS = 1.524  # AU
+
+s_mars = synodic_period_days(P_MARS, superior=True)
+s_venus = synodic_period_days(P_VENUS, superior=False)
+
+def orbital_speed_au_per_day(radius_au, period_days):
+    return 2 * np.pi * radius_au / period_days
+
+v_earth = orbital_speed_au_per_day(1.0, P_EARTH_DAYS)
+v_mars = orbital_speed_au_per_day(A_MARS, P_MARS)
+
+print(f&quot;Earth sidereal period P⊕ = {P_EARTH_DAYS:.2f} days&quot;)
+print(f&quot;Mars synodic period S    = {s_mars:.1f} days&quot;)
+print(f&quot;Venus synodic period S   = {s_venus:.1f} days&quot;)
+print(f&quot;Earth orbital speed      = {v_earth * AU / 86400 / 1000:.2f} km/s&quot;)
+print(f&quot;Mars orbital speed       = {v_mars * AU / 86400 / 1000:.2f} km/s&quot;)
+</code></pre>
+</details>
+<pre class="stream">Earth sidereal period P⊕ = 365.26 days
+Mars synodic period S    = 780.0 days
+Venus synodic period S   = 583.9 days
+Earth orbital speed      = 29.78 km/s
+Mars orbital speed       = 24.13 km/s
+</pre>
+
+<h2>Why the lines of sight cross</h2>
+<p>Both planets orbit the Sun in the same direction. Earth moves faster. Around the time Earth passes Mars, the line from Earth to Mars swings backward across the sky.</p>
+<p>While Earth is passing Mars, the lines of sight stop sweeping forward and swing back across one another. That backward swing is the retrograde part. Before and after it, the lines sweep steadily forward (prograde).</p>
+<p>The diagram below plays that overtaking. Faint lines are earlier sight lines. The bright line is the current one. It turns red while Mars is in retrograde, for roughly 70 days centered on opposition.</p>
+<div id="retrograde-stage"></div>
+<h2>What the animation is assuming</h2>
+<ul>
+<li>Earth and Mars move on circular orbits in the same plane.</li>
+<li>Only the viewing geometry matters. Mars is not changing the direction of its orbit.</li>
+<li>Retrograde here means the Earth–Mars line of sight is swinging backward, which is the backward motion of Mars against the stars.</li>
+</ul>

@@ -1,0 +1,113 @@
+<h1>Kepler's Third Law</h1>
+<h2>The law</h2>
+<p>A planet farther from the Sun takes longer to go all the way around.</p>
+<p><strong>Kepler's third law</strong> makes that precise. If</p>
+<ul>
+<li><strong>P</strong> is the time for one full orbit (the <strong>period</strong>),</li>
+<li><strong>a</strong> is the <strong>semi-major axis</strong> — half the long width of the ellipse; for a circle, <strong>a</strong> is just the radius,</li>
+</ul>
+<p>then</p>
+<p>$$P^2 \propto a^3.$$</p>
+<p>The square of the period grows with the cube of the orbit's size. Doubling the size does <strong>not</strong> double the period. It multiplies the period by $\sqrt{8} \approx 2.8$.</p>
+<h2>Where the formula comes from</h2>
+<p>For a planet orbiting a fixed Sun of mass <strong>M</strong>, Newton’s gravity gives</p>
+<p>$$P = 2\pi \sqrt{\frac{a^3}{GM}}.$$</p>
+<p><strong>G</strong> is the gravitational constant. Squaring both sides,</p>
+<p>$$P^2 = \frac{4\pi^2}{GM}\, a^3.$$</p>
+<p>Around the Sun, if <strong>a</strong> is measured in astronomical units (AU) and <strong>P</strong> in years, this becomes the simple line</p>
+<p>$$P^2 = a^3.$$</p>
+<p>Earth sits near <strong>a = 1 AU</strong> and <strong>P = 1 year</strong>, so $1^2 = 1^3$.</p>
+<h2>What this notebook does</h2>
+<p>Simulate several orbits of different sizes. Measure <strong>a</strong> and <strong>P</strong> from each simulation. Plot <strong>P²</strong> against <strong>a³</strong>. If the law holds, the points fall on the line <strong>P² = a³</strong>.</p>
+
+<details class="code-fold">
+  <summary>Show Python</summary>
+  <pre><code class="language-python">import sys
+from pathlib import Path
+
+ROOT = Path.cwd().parent if Path.cwd().name == &quot;notebooks&quot; else Path.cwd()
+if str(ROOT) not in sys.path:
+    sys.path.insert(0, str(ROOT))
+
+import numpy as np
+
+from src.physics import AU, M_SUN, YEAR, circular_orbital_speed, kepler_period
+from src.simulation import (
+    KeplerLawSample,
+    integrate_two_body,
+    orbit_elements_from_history,
+)
+from src.visualization import apply_dark_style, plot_kepler_third_law
+
+%matplotlib inline
+apply_dark_style()
+</code></pre>
+</details>
+
+
+<h2>1. Several orbits, different sizes</h2>
+<p>Each run starts the planet on the +x axis at a chosen distance. The sideways speed is <strong>90% of circular speed</strong> at that distance, so the path is a mild ellipse rather than a perfect circle. A circle has no clear closest point, and the period is easier to measure from one closest approach to the next.</p>
+<p>The Sun stays fixed at the origin. Only its gravity acts on the planet.</p>
+
+<details class="code-fold">
+  <summary>Show Python</summary>
+  <pre><code class="language-python">start_radii_au = [0.6, 0.8, 1.0, 1.4, 1.8]
+dt = 6 * 3600.0  # 6 hours, in seconds
+samples = []
+
+for r_au in start_radii_au:
+    r0 = r_au * AU
+    v_circ = circular_orbital_speed(r0, M_SUN)
+    pos0 = np.array([r0, 0.0, 0.0])
+    vel0 = np.array([0.0, 0.9 * v_circ, 0.0])
+
+    # Long enough to see at least two closest approaches.
+    n_steps = int(2.8 * kepler_period(r0, M_SUN) / dt)
+    history = integrate_two_body(pos0, vel0, M_SUN, dt, n_steps)
+    elements = orbit_elements_from_history(history)
+    samples.append(
+        KeplerLawSample(
+            semi_major_axis=elements[&quot;semi_major_axis_energy&quot;],
+            period=elements[&quot;period_simulated&quot;],
+            central_mass=M_SUN,
+        )
+    )
+
+print(f&quot;{&#x27;a (AU)&#x27;:&gt;10} {&#x27;P sim (yr)&#x27;:&gt;12} {&#x27;P formula (yr)&#x27;:&gt;16}&quot;)
+for sample in samples:
+    a_au = sample.semi_major_axis / AU
+    p_sim = sample.period / YEAR
+    p_formula = kepler_period(sample.semi_major_axis, M_SUN) / YEAR
+    print(f&quot;{a_au:10.3f} {p_sim:12.3f} {p_formula:16.3f}&quot;)
+</code></pre>
+</details>
+<pre class="stream">    a (AU)   P sim (yr)   P formula (yr)
+     0.504        0.358            0.358
+     0.672        0.551            0.551
+     0.840        0.770            0.770
+     1.176        1.276            1.276
+     1.513        1.860            1.860
+</pre>
+
+<h2>2. Does P² equal a³?</h2>
+<p>Each point is one simulated orbit. The dashed line is <strong>P² = a³</strong>. The solid line is a straight fit through the points. For the Sun, in these units, the slope should be about <strong>1</strong>.</p>
+
+<details class="code-fold">
+  <summary>Show Python</summary>
+  <pre><code class="language-python">import matplotlib.pyplot as plt
+
+fig = plot_kepler_third_law(samples)
+plt.show()
+</code></pre>
+</details>
+<p><img src="/projects/keplers-third-law/figure-1.png" alt="Figure 1" /></p>
+
+<h2>3. What this does and does not show</h2>
+<p>The points follow the line, so the simulation agrees with Kepler's third law for these orbits.</p>
+<p>This check assumes:</p>
+<ul>
+<li>The Sun is fixed and much heavier than the planet.</li>
+<li>Gravity is Newton's inverse-square law. There is no drag and no third body.</li>
+<li><strong>a</strong> comes from the orbit's energy, and <strong>P</strong> comes from the time between closest approaches.</li>
+</ul>
+<p>A different star mass would change the slope. The simple form <strong>P² = a³</strong> is special to measuring orbits around the Sun in years and AU.</p>

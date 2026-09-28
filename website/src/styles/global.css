@@ -112,6 +112,15 @@
   @apply my-6 overflow-x-auto text-white;
 }
 
+#sky-stage,
+#retrograde-stage {
+  margin: 1.5rem auto;
+  border: 1px solid #1c2740;
+  border-radius: 0.5rem;
+  background: #070b14;
+  overflow: hidden;
+}
+
 .scientific-article details pre {
   margin: 0;
   border: 0;

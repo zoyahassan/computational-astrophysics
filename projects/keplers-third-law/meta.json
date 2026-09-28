@@ -1,0 +1,14 @@
+{
+  "slug": "keplers-third-law",
+  "title": "Kepler's Third Law",
+  "subtitle": "Farther orbits take longer",
+  "description": "Simulate several orbits around the Sun and check that the square of the period grows with the cube of the orbit size.",
+  "topics": ["Orbital Mechanics"],
+  "tools": ["Python", "Jupyter", "NumPy", "Matplotlib", "Numerical Simulation"],
+  "status": "published",
+  "featured": true,
+  "notebook": "notebooks/kepler_third_law.ipynb",
+  "sourceRepoPath": "notebooks/kepler_third_law.ipynb",
+  "learning": "Carroll & Ostlie — Kepler's third law",
+  "published": "2026-09-28"
+}
