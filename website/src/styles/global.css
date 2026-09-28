@@ -113,6 +113,7 @@
 }
 
 #sky-stage,
+#ellipse-stage,
 #retrograde-stage {
   margin: 1.5rem auto;
   border: 1px solid #1c2740;

@@ -1,0 +1,89 @@
+<h1>Kepler's First Law</h1>
+<h2>The law</h2>
+<p>A planet's path around the Sun is an <strong>ellipse</strong>. The Sun does not sit at the center of that ellipse. It sits at one <strong>focus</strong>.</p>
+<p>An ellipse is a stretched circle. It has a center, and two foci at equal distances on either side of that center. The closer the foci are to the center, the rounder the ellipse looks. If both foci lie on the center, the path is a circle. A circle is just the special ellipse where the Sun happens to be in the middle.</p>
+<h2>Closest and farthest</h2>
+<ul>
+<li><strong>Periapsis</strong> is the closest point to the Sun. The Sun's focus is nearer this end.</li>
+<li><strong>Apoapsis</strong> is the farthest point from the Sun.</li>
+<li><strong>a</strong>, the semi-major axis, is half the long axis of the ellipse. It is half the distance from periapsis to apoapsis.</li>
+<li><strong>Eccentricity</strong> measures the stretch. It is 0 for a circle. Earth's orbit is about 0.017, so it is almost a circle. The orbit drawn here is more stretched, so you can see that the Sun is offset.</li>
+</ul>
+<h2>A check</h2>
+<p>Every point on an ellipse has the same total distance to the two foci: distance to the Sun plus distance to the empty focus equals <strong>2a</strong>, the full long axis. The simulation should agree with that.</p>
+
+<details class="code-fold">
+  <summary>Show Python</summary>
+  <pre><code class="language-python">import sys
+from pathlib import Path
+
+ROOT = Path.cwd().parent if Path.cwd().name == &quot;notebooks&quot; else Path.cwd()
+if str(ROOT) not in sys.path:
+    sys.path.insert(0, str(ROOT))
+
+import matplotlib.pyplot as plt
+import numpy as np
+
+from src.physics import AU, M_SUN, circular_orbital_speed, kepler_period
+from src.simulation import integrate_two_body
+from src.visualization import apply_dark_style, focus_geometry, plot_kepler_first_law
+
+%matplotlib inline
+apply_dark_style()
+</code></pre>
+</details>
+
+
+<h2>One stretched orbit</h2>
+<p>The planet starts at 1 AU, moving sideways at 65% of the speed a circular orbit would need at that distance. It is not going fast enough to stay on a circle, so it falls closer to the Sun and then swings back out.</p>
+<p>The Sun stays fixed at the origin. That origin is one focus. The center of the ellipse is somewhere else.</p>
+
+<details class="code-fold">
+  <summary>Show Python</summary>
+  <pre><code class="language-python">r0 = AU
+speed = 0.65 * circular_orbital_speed(r0, M_SUN)
+dt = 3600.0
+n_steps = int(1.4 * kepler_period(0.7 * r0, M_SUN) / dt)
+history = integrate_two_body(
+    np.array([r0, 0.0, 0.0]),
+    np.array([0.0, speed, 0.0]),
+    M_SUN,
+    dt,
+    n_steps,
+)
+
+geometry = focus_geometry(history)
+a_au = geometry[&quot;semi_major_axis&quot;] / AU
+print(f&quot;semi-major axis a = {a_au:.3f} AU&quot;)
+print(f&quot;eccentricity      = {geometry[&#x27;eccentricity&#x27;]:.3f}&quot;)
+print(f&quot;center is {np.linalg.norm(geometry[&#x27;center&#x27;]) / AU:.3f} AU from the Sun&quot;)
+
+positions = history.positions[::80, :2]
+sums = np.linalg.norm(positions - geometry[&quot;sun&quot;], axis=1)
+sums = sums + np.linalg.norm(positions - geometry[&quot;empty_focus&quot;], axis=1)
+print(f&quot;distance to both foci / (2a) ranges from {sums.min() / (2 * geometry[&#x27;semi_major_axis&#x27;]):.4f} to {sums.max() / (2 * geometry[&#x27;semi_major_axis&#x27;]):.4f}&quot;)
+
+fig = plot_kepler_first_law(history)
+plt.show()
+</code></pre>
+</details>
+<pre class="stream">semi-major axis a = 0.634 AU
+eccentricity      = 0.577
+center is 0.366 AU from the Sun
+distance to both foci / (2a) ranges from 0.9998 to 1.0002
+</pre>
+<p><img src="/projects/keplers-first-law/figure-1.png" alt="Figure 1" /></p>
+
+<h2>What the figure shows</h2>
+<p>The gold dot is the Sun. The open dot is the empty focus. The plus sign is the center of the ellipse.</p>
+<ul>
+<li><strong>a</strong> is half the long axis, from the center out to apoapsis.</li>
+<li><strong>b</strong> is half the short axis.</li>
+<li><strong>c</strong> is the distance from the center to the Sun. On a circle, <strong>c</strong> is zero and the Sun is the center.</li>
+</ul>
+<p>The Sun is closer to periapsis than to apoapsis. That is the first law: the Sun is a focus, not the center.</p>
+<h2>The planet moving</h2>
+<p>The same ellipse, with the planet traveling around it. It moves faster near the Sun and slower at the far end. The Sun stays at the focus.</p>
+<div id="ellipse-stage"></div>
+
+<p>This model assumes one planet, a fixed Sun, and Newtonian gravity. Real planetary orbits are ellipses too, but Earth's is so close to a circle that the offset of the Sun is small.</p>

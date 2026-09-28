@@ -1,0 +1,14 @@
+{
+  "slug": "keplers-first-law",
+  "title": "Kepler's First Law",
+  "subtitle": "The Sun sits at one focus",
+  "description": "An orbit is an ellipse. The Sun is not at the center — it sits at one focus, closer to the near end of the orbit.",
+  "topics": ["Orbital Mechanics"],
+  "tools": ["Python", "Jupyter", "NumPy", "Matplotlib", "Numerical Simulation"],
+  "status": "published",
+  "featured": true,
+  "notebook": "notebooks/kepler_first_law.ipynb",
+  "sourceRepoPath": "notebooks/kepler_first_law.ipynb",
+  "learning": "Carroll & Ostlie — Kepler's first law",
+  "published": "2026-09-28"
+}

@@ -94,6 +94,89 @@ def plot_orbit_diagnostics(history: OrbitHistory) -> plt.Figure:
     return fig
 
 
+def focus_geometry(history: OrbitHistory) -> dict[str, np.ndarray | float]:
+    """
+    Center, both foci, and periapsis/apoapsis of a simulated orbit.
+
+    The Sun is fixed at the origin, which is one focus. The empty focus is
+    the same distance on the other side of the ellipse's center.
+    """
+    positions = history.positions[:, :2]
+    radii = np.linalg.norm(positions, axis=1)
+    periapsis = positions[int(np.argmin(radii))]
+    apoapsis = positions[int(np.argmax(radii))]
+    center = 0.5 * (periapsis + apoapsis)
+    sun = np.zeros(2)
+    empty_focus = 2 * center - sun
+    semi_major_axis = 0.5 * float(np.linalg.norm(apoapsis - periapsis))
+    focus_distance = float(np.linalg.norm(center - sun))
+    eccentricity = focus_distance / semi_major_axis if semi_major_axis else 0.0
+    return {
+        "periapsis": periapsis,
+        "apoapsis": apoapsis,
+        "center": center,
+        "sun": sun,
+        "empty_focus": empty_focus,
+        "semi_major_axis": semi_major_axis,
+        "eccentricity": eccentricity,
+    }
+
+
+def plot_kepler_first_law(history: OrbitHistory) -> plt.Figure:
+    """Ellipse with the Sun at one focus and the center marked separately."""
+    from src.physics import AU
+
+    apply_dark_style()
+    geometry = focus_geometry(history)
+    fig, ax = plt.subplots(figsize=(7, 7))
+    orbit = history.positions[:, :2] / AU
+    ax.plot(orbit[:, 0], orbit[:, 1], color=INK, lw=1.2, label="orbit")
+
+    peri = np.asarray(geometry["periapsis"]) / AU
+    apo = np.asarray(geometry["apoapsis"]) / AU
+    sun = np.asarray(geometry["sun"]) / AU
+    empty = np.asarray(geometry["empty_focus"]) / AU
+    center = np.asarray(geometry["center"]) / AU
+
+    major = apo - peri
+    major = major / np.linalg.norm(major)
+    minor = np.array([-major[1], major[0]])
+    b_length = float(geometry["semi_major_axis"]) / AU * np.sqrt(
+        1 - float(geometry["eccentricity"]) ** 2
+    )
+    b_end = center + minor * b_length
+
+    ax.plot([peri[0], apo[0]], [peri[1], apo[1]], color=MUTED, lw=0.7, ls="--")
+    ax.plot([center[0], b_end[0]], [center[1], b_end[1]], color=MUTED, lw=0.7, ls="--")
+    ax.plot([center[0], sun[0]], [center[1], sun[1]], color="#8fbfa8", lw=0.9)
+
+    ax.plot(sun[0], sun[1], "o", color="#f0c14a", ms=11, zorder=5, label="Sun (one focus)")
+    ax.plot(empty[0], empty[1], "o", color=MUTED, ms=7, mfc="none", zorder=5, label="empty focus")
+    ax.plot(center[0], center[1], "+", color="#8fbfa8", ms=12, mew=1.4, zorder=5, label="center")
+
+    ax.annotate("periapsis", peri, textcoords="offset points", xytext=(-4, 16), ha="center", color=INK, fontsize=10)
+    ax.annotate("apoapsis", apo, textcoords="offset points", xytext=(4, 16), ha="center", color=INK, fontsize=10)
+    ax.annotate("$a$", (center + apo) / 2, textcoords="offset points", xytext=(0, 10), ha="center", color=INK, fontsize=12)
+    ax.annotate("$b$", (center + b_end) / 2, textcoords="offset points", xytext=(8, 0), va="center", color=INK, fontsize=12)
+    ax.annotate("$c$", (center + sun) / 2, textcoords="offset points", xytext=(0, -12), ha="center", color="#8fbfa8", fontsize=12)
+    ax.set_aspect("equal", adjustable="box")
+    pad = 0.22
+    ax.set_xlim(float(min(peri[0], apo[0])) - pad, float(max(peri[0], apo[0])) + pad)
+    ax.set_ylim(float(-b_length) - pad, float(b_length) + pad)
+    ax.set_xlabel("x (AU)")
+    ax.set_ylabel("y (AU)")
+    ax.set_title("The Sun is at a focus, not the center")
+    ax.legend(
+        loc="upper center",
+        bbox_to_anchor=(0.5, -0.12),
+        ncol=2,
+        frameon=False,
+        fontsize=9,
+    )
+    fig.tight_layout()
+    return fig
+
+
 def plot_kepler_third_law(samples: list[KeplerLawSample]) -> plt.Figure:
     """
     P² versus a³ for orbits around the Sun.
