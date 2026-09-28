@@ -1,0 +1,14 @@
+{
+  "slug": "keplers-second-law",
+  "title": "Kepler's Second Law",
+  "subtitle": "Equal areas in equal times",
+  "description": "Visual verification that a Sun–planet line sweeps equal areas in equal times, linking Kepler II to conservation of angular momentum.",
+  "topics": ["Orbital Mechanics"],
+  "tools": ["Python", "Jupyter", "NumPy", "Matplotlib", "Numerical Simulation"],
+  "status": "published",
+  "featured": true,
+  "notebook": "notebooks/kepler_second_law.ipynb",
+  "sourceRepoPath": "notebooks/kepler_second_law.ipynb",
+  "learning": "Carroll & Ostlie — Kepler's laws, angular momentum",
+  "published": "2026-03-28"
+}

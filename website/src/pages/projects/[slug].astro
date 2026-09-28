@@ -1,0 +1,61 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import { getProject, loadArticleHtml, loadProjects } from "../../lib/projects";
+
+export function getStaticPaths() {
+  return loadProjects().map((project) => ({ params: { slug: project.slug } }));
+}
+
+const { slug } = Astro.params;
+const project = getProject(slug!);
+if (!project) {
+  return Astro.redirect("/projects");
+}
+
+const articleHtml = project.status === "published" ? loadArticleHtml(project.slug) : null;
+const metaLine = [...project.topics, ...project.tools].join(" · ");
+---
+
+<BaseLayout title={`${project.title} — Zoya Hassan`} description={project.description}>
+  <article class="mx-auto max-w-3xl px-6 py-12 md:py-16">
+    <p class="text-xs uppercase tracking-[0.28em] text-white/60">{metaLine}</p>
+    <h1 class="mt-3 font-display text-4xl font-light uppercase tracking-[0.12em] text-white md:text-5xl">
+      {project.title}
+    </h1>
+    <p class="mt-3 text-xl text-mist/80">{project.subtitle}</p>
+    {
+      project.sourceRepoPath && (
+        <p class="mt-6 text-sm text-mist/60">
+          Notebook source:{" "}
+          <code class="font-mono text-sage">{project.sourceRepoPath}</code>
+        </p>
+      )
+    }
+
+    {
+      articleHtml ? (
+        <div class="scientific-article mt-12" set:html={articleHtml} />
+      ) : (
+        <p class="mt-12 text-mist/70">
+          This project is not published yet. The scientific write-up will appear here once the notebook is
+          rendered.
+        </p>
+      )
+    }
+  </article>
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      const el = document.querySelector(".scientific-article");
+      if (el && window.renderMathInElement) {
+        window.renderMathInElement(el, {
+          delimiters: [
+            { left: "$$", right: "$$", display: true },
+            { left: "$", right: "$", display: false },
+            { left: "\\(", right: "\\)", display: false },
+            { left: "\\[", right: "\\]", display: true },
+          ],
+        });
+      }
+    });
+  </script>
+</BaseLayout>

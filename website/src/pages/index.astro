@@ -1,0 +1,84 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+import ProjectCard from "../components/ProjectCard.astro";
+import { loadProjects } from "../lib/projects";
+
+const projects = loadProjects();
+const featured = projects.filter((p) => p.featured || p.status === "published");
+const upcoming = projects.filter((p) => p.status === "coming-soon");
+---
+
+<BaseLayout
+  title="Zoya Hassan — Computational Astrophysics"
+  description="Exploring astrophysics through mathematics, simulation, and code."
+  overlayNav
+>
+  <section class="relative flex min-h-screen flex-col items-center justify-center px-6 text-center">
+    <div
+      class="pointer-events-none absolute inset-0 bg-[url('/images/orion.jpg')] bg-cover bg-center"
+      aria-hidden="true"
+    >
+    </div>
+    <div
+      class="pointer-events-none absolute inset-0 bg-gradient-to-b from-black/35 via-black/20 to-black/80"
+      aria-hidden="true"
+    >
+    </div>
+
+    <div class="relative z-10 max-w-3xl">
+      <p class="text-xs font-medium uppercase tracking-[0.42em] text-white/80">Computational astrophysics</p>
+      <h1 class="mt-6 font-display text-5xl font-light tracking-tight text-white md:text-7xl">Zoya Hassan</h1>
+      <p class="mx-auto mt-6 max-w-xl text-lg font-light leading-relaxed text-white/85 md:text-xl">
+        Exploring astrophysics through mathematics, simulation, and code.
+      </p>
+    </div>
+
+    <a
+      href="#work"
+      class="absolute bottom-10 z-10 text-white/80 hover:text-white"
+      aria-label="Scroll to projects"
+    >
+      <svg width="28" height="28" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+        <path d="M6 9l6 6 6-6" stroke="currentColor" stroke-width="1.5"></path>
+      </svg>
+    </a>
+    <p class="absolute bottom-10 right-6 z-10 text-[10px] uppercase tracking-[0.18em] text-white/50 md:right-10">
+      Hubble / NASA, ESA
+    </p>
+  </section>
+
+  <section id="work" class="bg-black/80 px-6 py-20 backdrop-blur-sm md:px-10">
+    <div class="mx-auto max-w-6xl">
+      <h2 class="text-xs font-medium uppercase tracking-[0.32em] text-white/70">Featured projects</h2>
+      <div class="mt-8 grid gap-6 md:grid-cols-2">
+        {featured.map((project) => <ProjectCard project={project} />)}
+      </div>
+    </div>
+  </section>
+
+  <section class="bg-black/75 px-6 py-16 md:px-10">
+    <div class="mx-auto grid max-w-6xl gap-12 md:grid-cols-2">
+      <div>
+        <h2 class="text-xs font-medium uppercase tracking-[0.32em] text-white/70">About</h2>
+        <p class="mt-4 max-w-xl text-lg font-light leading-relaxed text-white/85">
+          Software engineer learning computational astrophysics. I work through textbook ideas, turn the
+          equations into Python, and check whether the simulation matches the physics.
+        </p>
+        <a href="/about" class="mt-6 inline-block text-xs uppercase tracking-[0.2em] text-white/70 hover:text-white">
+          More about me
+        </a>
+      </div>
+      <div>
+        <h2 class="text-xs font-medium uppercase tracking-[0.32em] text-white/70">Currently studying</h2>
+        <ul class="mt-4 space-y-3 text-white/85">
+          <li>Orbital mechanics — Kepler's laws, two-body motion</li>
+          <li>Numerical integration — velocity Verlet, energy and angular momentum</li>
+          <li>Upcoming: escape velocity, retrograde motion, simple N-body gravity</li>
+        </ul>
+      </div>
+    </div>
+    <div class="mx-auto mt-12 grid max-w-6xl gap-4 sm:grid-cols-2">
+      {upcoming.map((project) => <ProjectCard project={project} />)}
+    </div>
+  </section>
+</BaseLayout>

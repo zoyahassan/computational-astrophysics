@@ -1,0 +1,11 @@
+{
+  "slug": "orbital-mechanics",
+  "title": "Orbital Mechanics",
+  "subtitle": "Two-body orbits and integrators",
+  "description": "Circular and elliptical orbits with velocity Verlet — foundation for later experiments.",
+  "topics": ["Orbital Mechanics"],
+  "tools": ["Python", "NumPy"],
+  "status": "coming-soon",
+  "featured": false,
+  "notebook": null
+}

@@ -1,0 +1,11 @@
+{
+  "slug": "retrograde-motion",
+  "title": "Retrograde Motion",
+  "subtitle": "Apparent sky motion from Earth",
+  "description": "Heliocentric simulation and geocentric longitude — why Mars appears to move backward.",
+  "topics": ["Observational Astronomy", "Orbital Mechanics"],
+  "tools": ["Python"],
+  "status": "coming-soon",
+  "featured": false,
+  "notebook": null
+}

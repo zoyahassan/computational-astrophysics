@@ -1,0 +1,23 @@
+project:
+  title: "Scientific portfolio articles"
+
+format:
+  html:
+    theme: none
+    css: ../website/src/styles/quarto-article.css
+    toc: false
+    number-sections: false
+    code-fold: true
+    code-summary: "Show Python"
+    code-tools: false
+    fig-align: center
+    html-math-method: katex
+    embed-resources: false
+    self-contained: false
+    minimal: false
+    page-layout: article
+
+execute:
+  enabled: true
+  freeze: auto
+  daemon: false

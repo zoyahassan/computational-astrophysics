@@ -1,0 +1,142 @@
+<h1>Kepler's Second Law</h1>
+<h2>The law</h2>
+<p>Draw a line from the Sun to a moving planet. That line sweeps out a <strong>pie-slice</strong> shape as the planet moves.</p>
+<p><strong>Kepler's second law:</strong> If you wait the <strong>same amount of time</strong> each time, each pie-slice has the <strong>same area</strong>—whether the planet is close to the Sun or far away.</p>
+<p>So the slice can look <strong>thin and pointy</strong> (planet close in, moving fast) or <strong>wide and shallow</strong> (planet far out, moving slow). Different <em>shape</em>, same <em>area</em>.</p>
+<h2>Why that happens</h2>
+<ol>
+<li>
+<p><strong>Angular momentum</strong> measures how much "spinning around the Sun" the orbit has. For one planet, it stays <strong>nearly constant</strong> because gravity pulls toward the Sun—it doesn't twist the orbit.</p>
+</li>
+<li>
+<p>In the code we use a standard symbol <strong>h</strong> (really <strong>h</strong> with an arrow in textbooks):</p>
+<ul>
+<li><strong>r</strong> is the position vector from the Sun to the planet (where the planet is).</li>
+<li><strong>v</strong> is the velocity vector (which way and how fast it moves).</li>
+<li><strong>h = r × v</strong> is the cross product. It encodes how much the motion wraps around the Sun. Its size $|h|$ stays constant in this simulation.</li>
+</ul>
+</li>
+<li>
+<p>Geometry link: the <strong>area swept per second</strong> is $|h|/2$. Since $|h|$ is constant, <strong>equal times give equal areas</strong>. That <em>is</em> Kepler's second law in Newtonian language.</p>
+</li>
+</ol>
+<h2>What this notebook does</h2>
+<p>Simulate a planet on an <strong>ellipse</strong>, split one orbit into equal time chunks, color each chunk, and check that the areas match.</p>
+
+<details class="code-fold">
+  <summary>Show Python</summary>
+  <pre><code class="language-python">import sys
+from pathlib import Path
+
+ROOT = Path.cwd().parent if Path.cwd().name == &quot;notebooks&quot; else Path.cwd()
+if str(ROOT) not in sys.path:
+    sys.path.insert(0, str(ROOT))
+
+import matplotlib.pyplot as plt
+import numpy as np
+
+from src.kepler_second_law import areas_in_equal_time_intervals, theoretical_areal_rate
+from src.physics import AU, M_SUN, circular_orbital_speed
+from src.simulation import integrate_two_body, measure_orbital_period
+from src.visualization import (
+    apply_dark_style,
+    plot_equal_time_areas,
+    plot_kepler_second_law_sectors,
+    plot_speed_vs_radius,
+)
+
+%matplotlib inline
+apply_dark_style()
+</code></pre>
+</details>
+
+
+<h2>1. Set up an elliptical orbit</h2>
+<p>We need an <strong>ellipse</strong>, not a circle, so the "thin slice / wide slice" effect is obvious.</p>
+<p><strong>Initial conditions (step by step):</strong></p>
+<ul>
+<li><strong>1 AU</strong> = put the planet at Earth's distance from the Sun (about 150 million km). In code it sits on the <strong>+x axis</strong>: <code>(AU, 0, 0)</code>.</li>
+<li><strong>Tangential speed</strong> = velocity pointing straight <strong>along +y</strong> (sideways, not toward or away from the Sun).</li>
+<li><strong>Circular speed</strong> at 1 AU = the exact speed for a <strong>perfect circle</strong> at that distance: $v_{\mathrm{circ}} = \sqrt{GM/r}$.</li>
+</ul>
+<p>We choose speed <strong>0.72 × v_circ</strong>—<strong>slower</strong> than circular. That means:</p>
+<ul>
+<li>The planet does <strong>not</strong> have enough sideways speed to stay on a circle.</li>
+<li>It falls in a bit, swings around the Sun, and comes back out → a <strong>closed ellipse</strong> (stays bound to the Sun).</li>
+</ul>
+<p><strong>Periapsis</strong> = closest approach to the Sun (planet <strong>fastest</strong> there). <strong>Apoapsis</strong> = farthest point (<strong>slowest</strong> there). Kepler's second law is easiest to <em>see</em> on an ellipse because speed changes a lot around the orbit.</p>
+
+<details class="code-fold">
+  <summary>Show Python</summary>
+  <pre><code class="language-python">r0 = AU
+v_circ = circular_orbital_speed(r0, M_SUN)
+pos0 = np.array([r0, 0.0, 0.0])
+vel0 = np.array([0.0, 0.72 * v_circ, 0.0])  # try 0.65–0.95 * v_circ
+
+dt = 1800.0  # 30 min timestep (seconds)
+n_steps = int(500 * 86400 / dt)
+history = integrate_two_body(pos0, vel0, M_SUN, dt, n_steps)
+
+period = measure_orbital_period(history)
+print(f&quot;Estimated orbital period: {period / 86400:.1f} days&quot;)
+</code></pre>
+</details>
+<pre class="stream">Estimated orbital period: 202.5 days
+</pre>
+
+<h2>2. Equal-time sectors (visual Kepler II)</h2>
+<p>Each colored triangle connects the Sun to the planet at the start and end of an equal <strong>time</strong> interval. Near periapsis the arc is long in angle but the radius is short; near apoapsis the opposite — areas balance.</p>
+
+<details class="code-fold">
+  <summary>Show Python</summary>
+  <pre><code class="language-python">N_SECTORS = 12
+t_start = history.times[0]
+t_end = t_start + period
+
+areas, idx = areas_in_equal_time_intervals(history, N_SECTORS, t_start, t_end)
+areal_rate = theoretical_areal_rate(history)
+dt_interval = period / N_SECTORS
+
+fig = plot_kepler_second_law_sectors(history, idx, areas)
+plt.show()
+
+print(f&quot;Mean swept area: {areas.mean():.3e} m²&quot;)
+print(f&quot;Theory |h|/2 × Δt:  {areal_rate * dt_interval:.3e} m²&quot;)
+print(f&quot;Relative spread (max-min)/mean: {(areas.max()-areas.min())/areas.mean()*100:.1f}%&quot;)
+</code></pre>
+</details>
+<p><img src="/projects/keplers-second-law/figure-1.png" alt="Figure 1" /></p>
+<pre class="stream">Mean swept area: 2.339e+21 m²
+Theory |h|/2 × Δt:  2.339e+21 m²
+Relative spread (max-min)/mean: 0.0%
+</pre>
+
+<h2>3. Bar chart: area per interval</h2>
+<p>If the simulation and sector approximation are good, all bars sit near the dashed line $|\mathbf{h}|/2 \,\Delta t$.</p>
+
+<details class="code-fold">
+  <summary>Show Python</summary>
+  <pre><code class="language-python">fig = plot_equal_time_areas(areas, areal_rate, dt_interval)
+plt.show()
+</code></pre>
+</details>
+<p><img src="/projects/keplers-second-law/figure-2.png" alt="Figure 2" /></p>
+
+<h2>4. Why it looks that way: speed vs radius</h2>
+<p>Kepler II is the geometric face of <strong>angular momentum conservation</strong>: $|\mathbf{v}|$ is larger when $|\mathbf{r}|$ is smaller (for this 2D ellipse).</p>
+
+<details class="code-fold">
+  <summary>Show Python</summary>
+  <pre><code class="language-python">fig = plot_speed_vs_radius(history)
+plt.show()
+</code></pre>
+</details>
+<p><img src="/projects/keplers-second-law/figure-3.png" alt="Figure 3" /></p>
+
+<h2>5. Experiments to try</h2>
+<ol>
+<li>Change <code>0.72 * v_circ</code> → more eccentric orbit; watch sector <strong>shape</strong> change but areas stay similar.</li>
+<li>Use <code>1.0 * v_circ</code> for a circle: sectors look equal in <strong>width</strong> as well as area.</li>
+<li>Increase <code>dt</code> in the integrator until area spread grows — numerical error, not physics.</li>
+<li>Compare one period vs half a period (<code>N_SECTORS</code> and <code>t_end</code>).</li>
+</ol>

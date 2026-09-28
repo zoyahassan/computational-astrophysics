@@ -1,0 +1,129 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    @apply bg-black text-white antialiased;
+    background-image:
+      linear-gradient(180deg, rgba(0, 0, 0, 0.35), rgba(0, 0, 0, 0.72) 22%, rgba(5, 6, 10, 0.94) 55%),
+      url("/images/orion.jpg");
+    background-size: cover;
+    background-position: center top;
+    background-attachment: fixed;
+  }
+
+  ::selection {
+    background: rgba(126, 184, 201, 0.35);
+    color: #f4f7fb;
+  }
+}
+
+.scientific-article {
+  @apply max-w-none text-mist;
+}
+
+.scientific-article h1 {
+  @apply hidden;
+}
+
+.scientific-article h2 {
+  @apply mt-12 mb-4 font-display text-2xl font-light tracking-tight text-white;
+}
+
+.scientific-article h3 {
+  @apply mt-8 mb-3 text-lg font-medium text-white/90;
+}
+
+.scientific-article p {
+  margin: 0.9rem 0;
+  line-height: 1.75;
+  color: rgb(197 208 224 / 0.92);
+}
+
+.scientific-article strong {
+  color: #fff;
+  font-weight: 600;
+}
+
+.scientific-article ul,
+.scientific-article ol {
+  margin: 0.6rem 0 1rem;
+  padding-left: 1.4rem;
+}
+
+.scientific-article ul {
+  list-style: disc;
+}
+
+.scientific-article ol {
+  list-style: decimal;
+}
+
+.scientific-article li {
+  margin: 0.45rem 0;
+  line-height: 1.7;
+  color: rgb(197 208 224 / 0.92);
+}
+
+.scientific-article li > p {
+  margin: 0.2rem 0;
+}
+
+.scientific-article li > ul,
+.scientific-article li > ol {
+  margin: 0.35rem 0 0.2rem;
+}
+
+.scientific-article .katex {
+  color: #e8eef6;
+  font-size: 1.05em;
+}
+
+.scientific-article a {
+  @apply text-accent underline-offset-4 hover:text-white;
+}
+
+.scientific-article code {
+  @apply font-mono text-sm text-sage;
+}
+
+.scientific-article pre {
+  @apply overflow-x-auto rounded-lg border border-ink-700 bg-ink-900 p-4 text-sm;
+}
+
+.scientific-article img {
+  display: block;
+  margin: 1.5rem auto;
+  max-width: 100%;
+  height: auto;
+  padding: 0;
+  background: transparent;
+  border: 1px solid #1c2740;
+  border-radius: 0.5rem;
+  box-shadow: none;
+}
+
+.scientific-article .katex-display {
+  @apply my-6 overflow-x-auto text-white;
+}
+
+.scientific-article details pre {
+  margin: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  padding: 0 1rem 0.9rem;
+}
+
+.scientific-article details {
+  @apply my-4 rounded-lg border border-ink-700 bg-ink-900/60;
+}
+
+.scientific-article summary {
+  @apply cursor-pointer px-4 py-2 font-mono text-sm text-accent;
+}

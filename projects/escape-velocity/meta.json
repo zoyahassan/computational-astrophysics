@@ -1,0 +1,11 @@
+{
+  "slug": "escape-velocity",
+  "title": "Escape Velocity",
+  "subtitle": "When a orbit becomes unbound",
+  "description": "Relating initial speed to bound ellipses versus escape.",
+  "topics": ["Orbital Mechanics"],
+  "tools": ["Python"],
+  "status": "coming-soon",
+  "featured": false,
+  "notebook": null
+}

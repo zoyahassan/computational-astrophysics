@@ -1,0 +1,16 @@
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+.env
+.ipynb_checkpoints/
+.DS_Store
+.pytest_cache/
+website/node_modules/
+website/dist/
+website/.astro/
+website/.quarto-output/
+.mypy_cache/
+*.png
+!docs/**/*.png

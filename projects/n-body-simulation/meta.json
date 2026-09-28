@@ -1,0 +1,11 @@
+{
+  "slug": "n-body-simulation",
+  "title": "N-Body Simulation",
+  "subtitle": "Many gravitating masses",
+  "description": "Pairwise gravity, energy drift, and stable timestep choices.",
+  "topics": ["Computational Physics"],
+  "tools": ["Python", "NumPy"],
+  "status": "coming-soon",
+  "featured": false,
+  "notebook": null
+}
